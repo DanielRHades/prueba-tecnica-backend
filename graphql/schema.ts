@@ -62,6 +62,8 @@ export const typeDefs = `#graphql
     roles: [Role!]!
     sessions: [Session!]!
     users: [User!]!
+    userByEmail(email: String!): User
+    userById(id: String!): User
     userMonitorings: [UserMonitoring!]!
   }
 
