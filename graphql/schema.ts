@@ -58,14 +58,16 @@ export const typeDefs = `#graphql
   }
 
   type Query {
-    countries: [Country!]!
-    roles: [Role!]!
-    sessions: [Session!]!
-    users: [User!]!
+    countries(cursorById: String, take: Int, skip: Int): [Country!]!
+    roles(cursorById: String, take: Int, skip: Int): [Role!]!
+    sessions(cursorById: String, take: Int, skip: Int): [Session!]!
+    users(cursorById: String, take: Int, skip: Int): [User!]!
     userByEmail(email: String!): User!
     userById(id: String!): User!
-    userMonitorings: [UserMonitoring!]!
-    userMonitoringsByEmailAndDate(email: String!, startingDate: String!, endDate: String!): [UserMonitoring!]!
+    userMonitorings(cursorById: String, take: Int, skip: Int): [UserMonitoring!]!
+    userMonitoringsByEmailAndDate(
+      email: String!, startingDate: String!, endDate: String!, cursorById: String, take: Int, skip: Int): [UserMonitoring!]!
+      
     topThreeUsersByMonitoring(startingDate: String!, endDate: String!): [User!]!
     topThreeUsersByMonitoringDescriptionAndCountry(
       description: String!, countryId: String!, startingDate: String!, endDate: String!): [User!]!

@@ -4,44 +4,58 @@ import { requireRole, createNotFoundError } from '../utils/errors';
 
 export const userResolvers = {
     Query: {
-        users: async (_parent: any, _args: any, ctx: Context) => {
+        users: async (_parent: any, args: UserArguments, ctx: Context) => {
             requireRole(ctx, ['Admin', 'Manager']);
-            return ctx.prisma.user.findMany();
+        
+            const { cursorById, take = 10, skip = 1 } = args;
+            
+            return ctx.prisma.user.findMany({
+                take,
+                skip,
+                ...(cursorById && {
+                    cursor: {
+                        id: cursorById,
+                    },
+                }),
+                orderBy: {
+                    id: 'asc',
+                },
+            });
         },
 
         userByEmail: async (_parent: any, args: UserArguments, ctx: Context) => {
             const user = requireRole(ctx, ['Admin', 'Manager', 'User']);
-            
+
             if (user.Role?.name === 'User' && user.email !== args.email) {
                 throw createNotFoundError("No tienes permiso para ver este usuario.");
             }
-            
+
             const result = await ctx.prisma.user.findUnique({
                 where: { email: args.email },
             });
-            
+
             if (!result) {
                 throw createNotFoundError("Usuario no encontrado");
             }
-            
+
             return result;
         },
 
         userById: async (_parent: any, args: UserArguments, ctx: Context) => {
             const user = requireRole(ctx, ['Admin', 'Manager', 'User']);
-            
+
             if (user.Role?.name === 'User' && user.id !== args.id) {
                 throw createNotFoundError("No tienes permiso para ver este usuario.");
             }
-            
+
             const result = await ctx.prisma.user.findUnique({
                 where: { id: args.id },
             });
-            
+
             if (!result) {
                 throw createNotFoundError("Usuario no encontrado");
             }
-            
+
             return result;
         },
 

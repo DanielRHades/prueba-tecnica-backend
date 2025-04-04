@@ -4,14 +4,26 @@ import { requireRole} from '../utils/errors';
 
 export const userMonitoringResolvers = {
     Query: {
-        userMonitorings: async (_parent: any, _args: any, ctx: Context) => {
+        userMonitorings: async (_parent: any, args: UserMonitoringArguments, ctx: Context) => {
             requireRole(ctx, ['Admin']);
-            return ctx.prisma.userMonitoring.findMany();
+            const { cursorById, take = 10, skip = 1 } = args;
+            
+            return ctx.prisma.userMonitoring.findMany({
+                take,
+                skip,
+                ...(cursorById && {
+                    cursor: {
+                        id: cursorById,
+                    },
+                }),
+                orderBy: {
+                    id: 'asc',
+                },
+            });
         },
 
         userMonitoringsByEmailAndDate: async (_parent: any, args: UserMonitoringArguments, ctx: Context) => {
             requireRole(ctx, ['Admin']);
-
             const user = await ctx.prisma.user.findUnique({
                 where: { email: args.email },
             });
@@ -20,6 +32,8 @@ export const userMonitoringResolvers = {
                 throw new Error("El usuario con ese correo no existe.");
             }
 
+            const { cursorById, take = 10, skip = 1 } = args;
+
             return ctx.prisma.userMonitoring.findMany({
                 where: {
                     userId: user.id,
@@ -27,6 +41,16 @@ export const userMonitoringResolvers = {
                         gte: new Date(args.startingDate),
                         lte: new Date(args.endDate),
                     },
+                },
+                take,
+                skip,
+                ...(cursorById && {
+                    cursor: {
+                        id: cursorById,
+                    },
+                }),
+                orderBy: {
+                    id: 'asc',
                 },
             });
         },

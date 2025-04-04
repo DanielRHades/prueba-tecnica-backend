@@ -1,11 +1,25 @@
 import { Context } from '../context';
 import { requireRole } from '../utils/errors';
+import { SessionArguments } from './sessions.types';
 
 export const sessionResolvers = {
     Query: {
-        sessions: async (_parent: any, _args: any, ctx: Context) => {
+        sessions: async (_parent: any, args: SessionArguments, ctx: Context) => {
             requireRole(ctx, ['Admin']);
-            return ctx.prisma.session.findMany();
+            const { cursorById, take = 10, skip = 1 } = args;
+            
+            return ctx.prisma.session.findMany({
+                take,
+                skip,
+                ...(cursorById && {
+                    cursor: {
+                        id: cursorById,
+                    },
+                }),
+                orderBy: {
+                    id: 'asc',
+                },
+            });
         },
     },
     Session: {

@@ -1,6 +1,9 @@
 export interface UserArguments {
     email?: string;
-    id?: string;
+    id?: string;    
+    cursorById?: string;
+    take?: number; 
+    skip?: number; 
 }
 
 export interface TopMonitoringArguments {
