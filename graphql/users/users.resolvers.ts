@@ -1,54 +1,52 @@
 import { Context } from '../context';
 import { TopMonitoringArguments, TopMonitoringDescriptionAndCountryArguments, UserArguments } from './users.types';
+import { requireRole, createNotFoundError } from '../utils/errors';
 
 export const userResolvers = {
     Query: {
         users: async (_parent: any, _args: any, ctx: Context) => {
-            if (!ctx.user) throw new Error("Acceso denegado: El token no posee la información requerida del usuario.");
-
-            if (ctx.user.Role?.name === "Admin" || ctx.user.Role?.name === "Manager") {
-                return ctx.prisma.user.findMany();
-            }
-
-            {/*Si el usuario tiene el rol de User en la Token, 
-            se retorna unicamente su información propia.*/ }
-            const user = await ctx.prisma.user.findUnique({
-                where: { id: ctx.user.id },
-            });
-
-            return user ? [user] : [];
+            requireRole(ctx, ['Admin', 'Manager']);
+            return ctx.prisma.user.findMany();
         },
 
         userByEmail: async (_parent: any, args: UserArguments, ctx: Context) => {
-            if (!ctx.user) throw new Error("Acceso denegado: El token no posee la información requerida del usuario.");
-
-            if (ctx.user.Role?.name === "User" && ctx.user.email !== args.email) {
-                throw new Error("Acceso denegado: No tienes el rol necesario para esta query.");
+            const user = requireRole(ctx, ['Admin', 'Manager', 'User']);
+            
+            if (user.Role?.name === 'User' && user.email !== args.email) {
+                throw createNotFoundError("No tienes permiso para ver este usuario.");
             }
-
-            return ctx.prisma.user.findUnique({
+            
+            const result = await ctx.prisma.user.findUnique({
                 where: { email: args.email },
             });
+            
+            if (!result) {
+                throw createNotFoundError("Usuario no encontrado");
+            }
+            
+            return result;
         },
 
         userById: async (_parent: any, args: UserArguments, ctx: Context) => {
-            if (!ctx.user) throw new Error("Acceso denegado: El token no posee la información requerida del usuario.");
-
-            if (ctx.user.Role?.name === "User" && ctx.user.id !== args.id) {
-                throw new Error("Acceso denegado: No tienes el rol necesario para esta query.");
+            const user = requireRole(ctx, ['Admin', 'Manager', 'User']);
+            
+            if (user.Role?.name === 'User' && user.id !== args.id) {
+                throw createNotFoundError("No tienes permiso para ver este usuario.");
             }
-
-            return ctx.prisma.user.findUnique({
+            
+            const result = await ctx.prisma.user.findUnique({
                 where: { id: args.id },
             });
+            
+            if (!result) {
+                throw createNotFoundError("Usuario no encontrado");
+            }
+            
+            return result;
         },
 
         topThreeUsersByMonitoring: async (_parent: any, args: TopMonitoringArguments, ctx: Context) => {
-            if (!ctx.user) throw new Error("Acceso denegado: El token no posee la información requerida del usuario.");
-
-            if (ctx.user.Role?.name !== 'Admin') {
-                throw new Error("Acceso denegado: Solo los administradores pueden acceder a esta información.");
-            }
+            requireRole(ctx, ['Admin']);
 
             const topUsers = await ctx.prisma.userMonitoring.groupBy({
                 by: ['userId'],
@@ -77,11 +75,7 @@ export const userResolvers = {
             args: TopMonitoringDescriptionAndCountryArguments,
             ctx: Context
         ) => {
-            if (!ctx.user) throw new Error("Acceso denegado: El token no posee la información requerida del usuario.");
-
-            if (ctx.user.Role?.name !== 'Admin') {
-                throw new Error("Acceso denegado: Solo los administradores pueden acceder a esta información.");
-            }
+            requireRole(ctx, ['Admin']);
 
             const topUsers = await ctx.prisma.userMonitoring.groupBy({
                 by: ['userId'],
@@ -117,6 +111,9 @@ export const userResolvers = {
             return ctx.prisma.role.findUnique({ where: { id: parent.roleId } });
         },
         sessions: async (parent: any, _args: any, ctx: Context) => {
+            if (ctx.user.Role?.name === "Manager" && ctx.user.id != parent.id) {
+                return [];
+            }
             return ctx.prisma.session.findMany({ where: { userId: parent.id } });
         },
         countries: async (parent: any, _args: any, ctx: Context) => {

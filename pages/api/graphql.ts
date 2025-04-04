@@ -5,6 +5,7 @@ import { resolvers } from "@/graphql/resolvers";
 import { createContext, Context } from '../../graphql/context';
 import depthLimit from 'graphql-depth-limit';
 import { GraphQLError } from 'graphql';
+import { AppError, ErrorType } from '@/graphql/utils/errors';
 
 const apolloServer = new ApolloServer<Context>({
     typeDefs,
@@ -14,10 +15,29 @@ const apolloServer = new ApolloServer<Context>({
         if (err.message.includes("exceeds maximum operation depth")) {
             return new GraphQLError(
                 "Profundidad máxima permitida: 3. Reduce la complejidad de la consulta.",
-                { extensions: err.extensions }
+                { 
+                    extensions: {
+                        type: ErrorType.VALIDATION,
+                        code: 'DEPTH_LIMIT_EXCEEDED'
+                    }
+                }
             );
         }
-        return err;
+
+        if (err instanceof AppError) {
+            return err;
+        }
+
+        return new GraphQLError(
+            err.message || "Ha ocurrido un error interno",
+            {
+                extensions: {
+                    type: ErrorType.INTERNAL,
+                    code: 'INTERNAL_SERVER_ERROR',
+                    originalError: process.env.NODE_ENV === 'development' ? err : undefined
+                }
+            }
+        );
     },
 });
 
