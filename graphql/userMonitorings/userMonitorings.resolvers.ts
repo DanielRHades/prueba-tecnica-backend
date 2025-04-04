@@ -4,7 +4,7 @@ import { UserMonitoringArguments } from './userMonitorings.types';
 export const userMonitoringResolvers = {
     Query: {
         userMonitorings: async (_parent: any, _args: any, ctx: Context) => {
-            if (!ctx.user) throw new Error("Acceso denegado: El token no posee la información requerida.");
+            if (!ctx.user) throw new Error("Acceso denegado: El token no posee la información requerida del usuario.");
 
             if (ctx.user.Role?.name !== "Admin") {
                 throw new Error("Acceso denegado: Solo los administradores pueden acceder a esta información.");
@@ -14,7 +14,7 @@ export const userMonitoringResolvers = {
         },
 
         userMonitoringsByEmailAndDate: async (_parent: any, args: UserMonitoringArguments, ctx: Context) => {
-            if (!ctx.user) throw new Error("Acceso denegado: El token no posee la información requerida.");
+            if (!ctx.user) throw new Error("Acceso denegado: El token no posee la información requerida del usuario.");
 
             if (ctx.user.Role?.name !== "Admin") {
                 throw new Error("Acceso denegado: Solo los administradores pueden acceder a esta información.");
@@ -43,7 +43,7 @@ export const userMonitoringResolvers = {
     UserMonitoring: {
         user: async (parent: any, _args: any, ctx: Context) => {
             if (!ctx.user) {
-                throw new Error("Acceso denegado: El token no posee la información requerida.");
+                throw new Error("Acceso denegado: El token no posee la información requerida del usuario.");
             }
 
             if (ctx.user.Role?.name !== 'Admin') {

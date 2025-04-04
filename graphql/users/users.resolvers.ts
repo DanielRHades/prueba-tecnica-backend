@@ -1,16 +1,12 @@
 import { Context } from '../context';
-import { TopMonitoringArguments, UserArguments } from './users.types';
+import { TopMonitoringArguments, TopMonitoringDescriptionAndCountryArguments, UserArguments } from './users.types';
 
 export const userResolvers = {
     Query: {
         users: async (_parent: any, _args: any, ctx: Context) => {
-            if (!ctx.user) throw new Error("Acceso denegado: El token no posee la información requerida.");
+            if (!ctx.user) throw new Error("Acceso denegado: El token no posee la información requerida del usuario.");
 
-            if (ctx.user.Role?.name === "Admin") {
-                return ctx.prisma.user.findMany();
-            }
-
-            if (ctx.user.Role?.name === "Manager") {
+            if (ctx.user.Role?.name === "Admin" || ctx.user.Role?.name === "Manager") {
                 return ctx.prisma.user.findMany();
             }
 
@@ -24,7 +20,7 @@ export const userResolvers = {
         },
 
         userByEmail: async (_parent: any, args: UserArguments, ctx: Context) => {
-            if (!ctx.user) throw new Error("Acceso denegado: El token no posee la información requerida.");
+            if (!ctx.user) throw new Error("Acceso denegado: El token no posee la información requerida del usuario.");
 
             if (ctx.user.Role?.name === "User" && ctx.user.email !== args.email) {
                 throw new Error("Acceso denegado: No tienes el rol necesario para esta query.");
@@ -36,7 +32,7 @@ export const userResolvers = {
         },
 
         userById: async (_parent: any, args: UserArguments, ctx: Context) => {
-            if (!ctx.user) throw new Error("Acceso denegado: El token no posee la información requerida.");
+            if (!ctx.user) throw new Error("Acceso denegado: El token no posee la información requerida del usuario.");
 
             if (ctx.user.Role?.name === "User" && ctx.user.id !== args.id) {
                 throw new Error("Acceso denegado: No tienes el rol necesario para esta query.");
@@ -48,7 +44,7 @@ export const userResolvers = {
         },
 
         topThreeUsersByMonitoring: async (_parent: any, args: TopMonitoringArguments, ctx: Context) => {
-            if (!ctx.user) throw new Error("Acceso denegado: No hay información del usuario.");
+            if (!ctx.user) throw new Error("Acceso denegado: El token no posee la información requerida del usuario.");
 
             if (ctx.user.Role?.name !== 'Admin') {
                 throw new Error("Acceso denegado: Solo los administradores pueden acceder a esta información.");
@@ -61,6 +57,45 @@ export const userResolvers = {
                     createdAt: {
                         gte: new Date(args.startingDate),
                         lte: new Date(args.endDate),
+                    },
+                },
+                orderBy: { _count: { userId: 'desc' } },
+                take: 3,
+            });
+
+            if (!topUsers.length) return [];
+
+            const userIds = topUsers.map(u => u.userId);
+
+            return ctx.prisma.user.findMany({
+                where: { id: { in: userIds } }
+            });
+        },
+
+        topThreeUsersByMonitoringDescriptionAndCountry: async (
+            _parent: any,
+            args: TopMonitoringDescriptionAndCountryArguments,
+            ctx: Context
+        ) => {
+            if (!ctx.user) throw new Error("Acceso denegado: El token no posee la información requerida del usuario.");
+
+            if (ctx.user.Role?.name !== 'Admin') {
+                throw new Error("Acceso denegado: Solo los administradores pueden acceder a esta información.");
+            }
+
+            const topUsers = await ctx.prisma.userMonitoring.groupBy({
+                by: ['userId'],
+                _count: { userId: true },
+                where: {
+                    description: args.description,
+                    createdAt: {
+                        gte: new Date(args.startingDate),
+                        lte: new Date(args.endDate),
+                    },
+                    User: {
+                        Country: {
+                            some: { id: args.countryId },
+                        },
                     },
                 },
                 orderBy: { _count: { userId: 'desc' } },

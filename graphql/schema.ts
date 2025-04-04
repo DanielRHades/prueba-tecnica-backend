@@ -67,6 +67,8 @@ export const typeDefs = `#graphql
     userMonitorings: [UserMonitoring!]!
     userMonitoringsByEmailAndDate(email: String!, startingDate: String!, endDate: String!): [UserMonitoring!]!
     topThreeUsersByMonitoring(startingDate: String!, endDate: String!): [User!]!
+    topThreeUsersByMonitoringDescriptionAndCountry(
+      description: String!, countryId: String!, startingDate: String!, endDate: String!): [User!]!
   }
 
 `;

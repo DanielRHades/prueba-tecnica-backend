@@ -3,7 +3,7 @@ import { Context } from '../context';
 export const countryResolvers = {
     Query: {
         countries: async (_parent: any, _args: any, ctx: Context) => {
-            if (!ctx.user) throw new Error("Acceso denegado: El token no posee la información requerida.");
+            if (!ctx.user) throw new Error("Acceso denegado: El token no posee la información requerida del usuario.");
 
             if (ctx.user.Role?.name === "User") {
                 throw new Error("Acceso denegado: No tienes permiso para acceder a los countries.");
@@ -16,7 +16,7 @@ export const countryResolvers = {
     Country: {
         users: async (parent: any, _args: any, ctx: Context) => {
             if (!ctx.user) {
-                throw new Error('Acceso denegado: El token no posee la información requerida.');
+                throw new Error("Acceso denegado: El token no posee la información requerida del usuario.");
             }
 
             if (ctx.user.Role?.name === 'User') {

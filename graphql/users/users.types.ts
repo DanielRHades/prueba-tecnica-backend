@@ -7,3 +7,10 @@ export interface TopMonitoringArguments {
     startingDate: string;
     endDate: string;
 }
+
+export interface TopMonitoringDescriptionAndCountryArguments {
+    description: string,
+    countryId: string,
+    startingDate: string;
+    endDate: string;
+}
