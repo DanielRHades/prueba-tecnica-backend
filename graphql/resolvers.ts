@@ -14,4 +14,8 @@ export const resolvers = {
     },
     User: userResolvers.User,
     Country: countryResolvers.Country,
+    Role: roleResolvers.Role,
+    Session: sessionResolvers.Session,
+    UserMonitoring: userMonitoringResolvers.UserMonitoring
+
 };

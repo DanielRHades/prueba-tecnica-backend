@@ -6,9 +6,7 @@ export const countryResolvers = {
             if (!ctx.user) throw new Error("Acceso denegado: El token no posee la información requerida.");
 
             if (ctx.user.Role?.name === "User") {
-                return ctx.prisma.country.findMany({
-                    where: { id: { in: ctx.user.Country.map(c => c.id) } },
-                });
+                throw new Error("Acceso denegado: No tienes permiso para acceder a los countries.");
             }
 
             return ctx.prisma.country.findMany();
@@ -17,9 +15,18 @@ export const countryResolvers = {
 
     Country: {
         users: async (parent: any, _args: any, ctx: Context) => {
+            if (!ctx.user) {
+                throw new Error('Acceso denegado: El token no posee la información requerida.');
+            }
+
+            if (ctx.user.Role?.name === 'User') {
+                throw new Error('Acceso denegado: No tienes permiso para ver los usuarios de este país.');
+            }
+
             return ctx.prisma.country
                 .findUnique({ where: { id: parent.id } })
                 .User();
         },
     },
 };
+

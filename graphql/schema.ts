@@ -43,7 +43,7 @@ export const typeDefs = `#graphql
     updatedAt: DateTime!
     roleId: String
     role: Role
-    session: [Session!]!
+    sessions: [Session!]!
     countries: [Country!]!
     userMonitorings: [UserMonitoring!]!
   }
@@ -62,9 +62,11 @@ export const typeDefs = `#graphql
     roles: [Role!]!
     sessions: [Session!]!
     users: [User!]!
-    userByEmail(email: String!): User
-    userById(id: String!): User
+    userByEmail(email: String!): User!
+    userById(id: String!): User!
     userMonitorings: [UserMonitoring!]!
+    userMonitoringsByEmailAndDate(email: String!, startingDate: String!, endDate: String!): [UserMonitoring!]!
+    topThreeUsersByMonitoring(startingDate: String!, endDate: String!): [User!]!
   }
 
 `;
