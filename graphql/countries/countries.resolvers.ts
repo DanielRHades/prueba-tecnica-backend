@@ -1,25 +1,21 @@
 import { Context } from '../context';
-import { requireRole} from '../utils/errors';
+import { requireRole } from '../utils/errors';
 import { CountryArguments } from './countries.types';
 
 export const countryResolvers = {
     Query: {
         countries: async (_parent: any, args: CountryArguments, ctx: Context) => {
             requireRole(ctx, ['Admin', 'Manager']);
-            const { cursorById, take = 10, skip = 1 } = args;
-            
-            return ctx.prisma.country.findMany({
-                take,
-                skip,
-                ...(cursorById && {
-                    cursor: {
-                        id: cursorById,
-                    },
-                }),
-                orderBy: {
-                    id: 'asc',
-                },
-            });
+            const { cursorById, take = 10, skip = 0 } = args;
+
+            const countries = await ctx.prisma.$queryRaw<any[]>`
+            SELECT * FROM "Country"
+            WHERE (${cursorById}::text IS NULL OR "id" > ${cursorById}::text)
+            ORDER BY "id" ASC
+            LIMIT ${take} OFFSET ${skip}
+            `;
+
+            return countries;
         },
     },
 
