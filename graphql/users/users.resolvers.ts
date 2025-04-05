@@ -4,6 +4,8 @@ import { requireRole, createNotFoundError } from '../utils/errors';
 
 export const userResolvers = {
     Query: {
+        /* Query que devuelve todos los Users. Este query devuelve información sólo para
+        usuarios Admin o Manager. */
         users: async (_parent: any, args: UserArguments, ctx: Context) => {
             requireRole(ctx, ['Admin', 'Manager']);
         
@@ -23,6 +25,8 @@ export const userResolvers = {
             });
         },
 
+        /* Query que devuelve un User por su email. Este query devuelve información para
+        usuarios Admin, Manager o User si el email es del usuario que está autenticado. */
         userByEmail: async (_parent: any, args: UserArguments, ctx: Context) => {
             const user = requireRole(ctx, ['Admin', 'Manager', 'User']);
 
@@ -41,6 +45,8 @@ export const userResolvers = {
             return result;
         },
 
+        /* Query que devuelve un User por su id. Este query devuelve información para
+        usuarios Admin, Manager o User si el id es del usuario que está autenticado. */
         userById: async (_parent: any, args: UserArguments, ctx: Context) => {
             const user = requireRole(ctx, ['Admin', 'Manager', 'User']);
 
@@ -59,6 +65,9 @@ export const userResolvers = {
             return result;
         },
 
+        /* Query que devuelve los 3 usuarios con más monitoreos en un rango de tiempo, pasando como parámetros:
+            - Fecha inicial del rango de búsqueda
+            - Fecha final del rango de búsqueda */
         topThreeUsersByMonitoring: async (_parent: any, args: TopMonitoringArguments, ctx: Context) => {
             requireRole(ctx, ['Admin']);
 
@@ -84,6 +93,11 @@ export const userResolvers = {
             });
         },
 
+        /* Query que devuelve los 3 usuarios con más monitoreos en un rango de tiempo, pasando como parámetros:
+            - La descripción del monitoreo
+            - Fecha inicial del rango de búsqueda
+            - Fecha final del rango de búsqueda
+            - El id del país */
         topThreeUsersByMonitoringDescriptionAndCountry: async (
             _parent: any,
             args: TopMonitoringDescriptionAndCountryArguments,

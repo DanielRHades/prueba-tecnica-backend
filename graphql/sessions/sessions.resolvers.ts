@@ -4,6 +4,8 @@ import { SessionArguments } from './sessions.types';
 
 export const sessionResolvers = {
     Query: {
+        /* Query que devuelve todos los Sessions. Este query devuelve información sólo para
+        usuarios Admin. */
         sessions: async (_parent: any, args: SessionArguments, ctx: Context) => {
             requireRole(ctx, ['Admin']);
             const { cursorById, take = 10, skip = 1 } = args;

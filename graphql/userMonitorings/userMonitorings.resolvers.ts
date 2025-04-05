@@ -4,6 +4,8 @@ import { requireRole} from '../utils/errors';
 
 export const userMonitoringResolvers = {
     Query: {
+        /* Query que devuelve todos los UserMonitorings. Este query devuelve información sólo para
+        usuarios Admin. */
         userMonitorings: async (_parent: any, args: UserMonitoringArguments, ctx: Context) => {
             requireRole(ctx, ['Admin']);
             const { cursorById, take = 10, skip = 1 } = args;
@@ -22,6 +24,10 @@ export const userMonitoringResolvers = {
             });
         },
 
+        /* Query que devuelve todos los UserMonitoring de un user en un rango de tiempo, pasando como parámetros:
+            - El correo del usuario
+            - Fecha inicial del rango de búsqueda
+            - Fecha final del rango de búsqueda */
         userMonitoringsByEmailAndDate: async (_parent: any, args: UserMonitoringArguments, ctx: Context) => {
             requireRole(ctx, ['Admin']);
             const user = await ctx.prisma.user.findUnique({

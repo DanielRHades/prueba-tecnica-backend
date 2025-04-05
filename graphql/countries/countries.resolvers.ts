@@ -4,6 +4,8 @@ import { CountryArguments } from './countries.types';
 
 export const countryResolvers = {
     Query: {
+        /* Query que devuelve todos los Countries. Este query devuelve información sólo para
+        usuarios Admin o Manager. */
         countries: async (_parent: any, args: CountryArguments, ctx: Context) => {
             requireRole(ctx, ['Admin', 'Manager']);
             const { cursorById, take = 10, skip = 0 } = args;
