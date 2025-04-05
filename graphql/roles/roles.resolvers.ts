@@ -4,6 +4,8 @@ import { RoleArguments } from './roles.types';
 
 export const roleResolvers = {
     Query: {
+        /* Query que devuelve todos los Roles. Este query devuelve información sólo para
+        usuarios Admin o Manager. */
         roles: async (_parent: any, args: RoleArguments, ctx: Context) => {
             requireRole(ctx, ['Admin', 'Manager']);
             const { cursorById, take = 10, skip = 1 } = args;
