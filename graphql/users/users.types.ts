@@ -1,5 +1,3 @@
-import { Role } from "@prisma/client";
-
 export interface UserArguments {
     email?: string;
     id?: string;
@@ -21,9 +19,13 @@ export interface TopMonitoringDescriptionAndCountryArguments {
 }
 
 export interface CreateUserArguments {
-    id: string,
+    name?: string,
     email: string,
-    createdAt: string,
-    updatedAt: string,
-    roleId: string,
+    password: string,
+    roleId?: string,
+}
+
+export interface LoginArguments {
+    email: string;
+    password: string;
 }

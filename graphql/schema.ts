@@ -34,6 +34,7 @@ export const typeDefs = `#graphql
   type User {
     id: String!
     email: String!
+    password: String!
     emailVerified: DateTime
     termsAndConditionsAccepted: DateTime
     name: String
@@ -57,6 +58,13 @@ export const typeDefs = `#graphql
     user: User!
   }
 
+  type AuthPayload {
+    id: String!
+    email: String!
+    name: String
+    sessionToken: String!
+  }
+
   type Query {
     countries(cursorById: String, take: Int, skip: Int): [Country!]!
     roles(cursorById: String, take: Int, skip: Int): [Role!]!
@@ -74,7 +82,8 @@ export const typeDefs = `#graphql
   }
 
   type Mutation {
-    createUser (id: String, email: String, createdAt: String, updatedAt: String, roleId: String, ): User!
+    createUser (name: String, email: String!, password: String!, roleId: String): User!
+    login(email: String!, password: String!): AuthPayload!
   }
 
 `;

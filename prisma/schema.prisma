@@ -9,7 +9,7 @@ datasource db {
 }
 
 model Country {
-  id        String   @id
+  id        String   @id @default(cuid())
   name      String
   createdAt DateTime @default(now())
   updatedAt DateTime
@@ -17,14 +17,14 @@ model Country {
 }
 
 model Role {
-  id        String        @id
+  id        String        @id @default(cuid())
   name      Enum_RoleName
   createdAt DateTime      @default(now())
   User      User[]
 }
 
 model Session {
-  id           String   @id
+  id           String   @id @default(cuid())
   sessionToken String   @unique
   userId       String
   expiresAt    DateTime
@@ -33,9 +33,9 @@ model Session {
 }
 
 model User {
-  id                         String           @id
+  id                         String           @id @default(cuid())
   email                      String           @unique
-  password                   String?
+  password                   String
   emailVerified              DateTime?
   termsAndConditionsAccepted DateTime?
   name                       String?
@@ -51,7 +51,7 @@ model User {
 }
 
 model UserMonitoring {
-  id          String   @id
+  id          String   @id @default(cuid())
   usage       Int
   description String
   userId      String

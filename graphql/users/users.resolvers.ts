@@ -1,6 +1,10 @@
 import { Context } from '../context';
 import { CreateUserArguments, TopMonitoringArguments, TopMonitoringDescriptionAndCountryArguments, UserArguments } from './users.types';
 import { requireRole, createNotFoundError } from '../utils/errors';
+import { loginUserWithCredentials } from '@/services/auth.services';
+import { now } from 'next-auth/client/_utils';
+
+const { hash } = require('bcryptjs');
 
 export const userResolvers = {
     Query: {
@@ -136,17 +140,22 @@ export const userResolvers = {
 
     Mutation: {
         createUser: async (_parent: any, args: CreateUserArguments, ctx: Context) => {
+            const hashPassword = await hash(args.password, 10);
             return ctx.prisma.user.create({
                 data: {
-                    id: args.id,
+                    name: args.name,
                     email: args.email,
-                    createdAt: args.createdAt,
-                    updatedAt: args.updatedAt,
+                    password: hashPassword,
+                    updatedAt: new Date(),
                     roleId: args.roleId,
                 }
             })
-        }
+        },
+        login: async (_: any, { email, password }: { email: string; password: string }) => {
+            return await loginUserWithCredentials(email, password);
+        },
     },
+
 
     User: {
         role: async (parent: any, _args: any, ctx: Context) => {
