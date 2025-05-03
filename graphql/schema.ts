@@ -73,4 +73,8 @@ export const typeDefs = `#graphql
       description: String!, countryId: String!, startingDate: String!, endDate: String!): [User!]!
   }
 
+  type Mutation {
+    createUser (id: String, email: String, createdAt: String, updatedAt: String, roleId: String, ): User!
+  }
+
 `;

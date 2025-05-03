@@ -1,4 +1,4 @@
-import { PrismaClient, User, Role, Country } from "@prisma/client";
+import { PrismaClient, User, Role } from "@prisma/client";
 import { NextApiRequest } from "next";
 import { prisma } from "../lib/prisma";
 

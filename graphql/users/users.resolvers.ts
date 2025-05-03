@@ -1,5 +1,5 @@
 import { Context } from '../context';
-import { TopMonitoringArguments, TopMonitoringDescriptionAndCountryArguments, UserArguments } from './users.types';
+import { CreateUserArguments, TopMonitoringArguments, TopMonitoringDescriptionAndCountryArguments, UserArguments } from './users.types';
 import { requireRole, createNotFoundError } from '../utils/errors';
 
 export const userResolvers = {
@@ -8,9 +8,9 @@ export const userResolvers = {
         usuarios Admin o Manager. */
         users: async (_parent: any, args: UserArguments, ctx: Context) => {
             requireRole(ctx, ['Admin', 'Manager']);
-        
+
             const { cursorById, take = 10, skip = 1 } = args;
-            
+
             return ctx.prisma.user.findMany({
                 take,
                 skip,
@@ -132,6 +132,20 @@ export const userResolvers = {
                 where: { id: { in: userIds } }
             });
         },
+    },
+
+    Mutation: {
+        createUser: async (_parent: any, args: CreateUserArguments, ctx: Context) => {
+            return ctx.prisma.user.create({
+                data: {
+                    id: args.id,
+                    email: args.email,
+                    createdAt: args.createdAt,
+                    updatedAt: args.updatedAt,
+                    roleId: args.roleId,
+                }
+            })
+        }
     },
 
     User: {

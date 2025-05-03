@@ -12,6 +12,9 @@ export const resolvers = {
         ...sessionResolvers.Query,
         ...userMonitoringResolvers.Query,
     },
+    Mutation: {
+        ...userResolvers.Mutation,
+    },
     User: userResolvers.User,
     Country: countryResolvers.Country,
     Role: roleResolvers.Role,
