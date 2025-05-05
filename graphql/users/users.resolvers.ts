@@ -1,10 +1,9 @@
 import { Context } from '../context';
 import { CreateUserArguments, TopMonitoringArguments, TopMonitoringDescriptionAndCountryArguments, UserArguments } from './users.types';
 import { requireRole, createNotFoundError } from '../utils/errors';
-import { loginUserWithCredentials } from '@/services/auth.services';
-import { now } from 'next-auth/client/_utils';
+import { loginUserWithCredentials } from '@/services/auth.service';
+import { hash } from 'bcryptjs';
 
-const { hash } = require('bcryptjs');
 
 export const userResolvers = {
     Query: {

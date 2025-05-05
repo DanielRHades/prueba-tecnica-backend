@@ -1,4 +1,5 @@
 import { NextApiRequest } from "next";
+import { prisma } from './prisma'
 import jwt from "jsonwebtoken";
 
 export async function getUserFromToken(req: NextApiRequest) {
