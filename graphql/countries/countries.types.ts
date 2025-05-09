@@ -1,5 +1,5 @@
-export interface CountryArguments {  
-    cursorById?: string;
-    take?: number; 
-    skip?: number; 
+export interface CountryArguments {
+  cursorById?: string;
+  take?: number;
+  skip?: number;
 }

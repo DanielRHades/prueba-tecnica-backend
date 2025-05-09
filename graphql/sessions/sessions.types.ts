@@ -1,5 +1,5 @@
-export interface SessionArguments {  
-    cursorById?: string;
-    take?: number; 
-    skip?: number; 
+export interface SessionArguments {
+  cursorById?: string;
+  take?: number;
+  skip?: number;
 }
