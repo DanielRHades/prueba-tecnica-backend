@@ -1,5 +1,8 @@
-import { prisma } from '../lib/prisma.js';
+import { PrismaClient } from '@prisma/client';
 import { hash } from 'bcryptjs';
+
+//No utilizo el singleton de PrismaClient debido a que se ejecuta fuera de NextJs
+const prisma = new PrismaClient();
 
 async function main() {
   const now = new Date();
